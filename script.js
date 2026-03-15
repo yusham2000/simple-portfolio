@@ -91,11 +91,28 @@ function animateSkillBars() {
         const rect = bar.getBoundingClientRect();
         const isVisible = rect.top < window.innerHeight && rect.bottom > 0;
         
-        if (isVisible && bar.style.width === '0px') {
+        if (isVisible && !bar.classList.contains('animated')) {
+            bar.classList.add('animated');
             const progress = bar.getAttribute('data-progress');
+            
+            // Force initial state
+            bar.style.transition = 'none';
+            bar.style.width = '0%';
+            
+            // Force reflow
+            bar.offsetHeight;
+            
+            // Add transition and animate
+            bar.style.transition = 'width 2s cubic-bezier(0.4, 0, 0.2, 1)';
+            bar.style.width = progress + '%';
+            
+            // Add glow effect when animating
+            bar.style.boxShadow = '0 0 20px rgba(255, 255, 255, 0.6)';
+            
+            // Remove glow after animation completes
             setTimeout(() => {
-                bar.style.width = progress + '%';
-            }, 200);
+                bar.style.boxShadow = '0 0 10px rgba(255, 255, 255, 0.3)';
+            }, 2000);
         }
     });
 }
@@ -258,6 +275,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Initialize skill bars
     skillBars.forEach(bar => {
         bar.style.width = '0%';
+        bar.classList.add('ready-to-animate');
     });
     
     // Check if skill bars are in viewport on load
@@ -284,9 +302,36 @@ function typeWriter() {
     setTimeout(type, 500);
 }
 
+// Enhanced Header Animations
+function animateHeaderElements() {
+    const subtitle = document.querySelector('.animated-subtitle');
+    const buttons = document.querySelectorAll('.header-buttons .btn');
+    
+    // Animate subtitle
+    if (subtitle) {
+        subtitle.style.opacity = '0';
+        subtitle.style.transform = 'translateY(30px)';
+        setTimeout(() => {
+            subtitle.style.opacity = '1';
+            subtitle.style.transform = 'translateY(0)';
+        }, 800);
+    }
+    
+    // Animate buttons with stagger
+    buttons.forEach((btn, index) => {
+        btn.style.opacity = '0';
+        btn.style.transform = 'translateY(30px)';
+        setTimeout(() => {
+            btn.style.opacity = '1';
+            btn.style.transform = 'translateY(0)';
+        }, 1000 + (index * 200));
+    });
+}
+
 // Initialize typing animation when page loads
 window.addEventListener('load', () => {
     typeWriter();
+    animateHeaderElements();
 });
 
 // Parallax Effect for Header
